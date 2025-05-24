@@ -1,0 +1,19 @@
+{
+  "name": "hosptal-mgmt-server",
+  "version": "1.0.0",
+  "description": "Node Js server for hospital management ",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sagarrajput2111/hospital-mgmt-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sagarrajput2111/hospital-mgmt-server/issues"
+  },
+  "homepage": "https://github.com/sagarrajput2111/hospital-mgmt-server#readme"
+}
