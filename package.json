@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Node Js server for hospital management ",
   "main": "app.js",
+  "type": "module",
   "scripts": {
-    "test": "node app"
+    "test": "node app",
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,13 @@
   "bugs": {
     "url": "https://github.com/sagarrajput2111/hospital-mgmt-server/issues"
   },
-  "homepage": "https://github.com/sagarrajput2111/hospital-mgmt-server#readme"
+  "homepage": "https://github.com/sagarrajput2111/hospital-mgmt-server#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.0",
+    "nodemon": "^3.1.10"
+  }
 }
