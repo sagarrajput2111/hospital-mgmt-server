@@ -2,8 +2,7 @@ import express from "express";
 import authRouter from "./routes/auth.route.js";
 import patientRouter from "./routes/patient.route.js"
 import mongoose from "mongoose";
-import user from "./models/user.js"
-
+import cors from "cors";
 // Load .env only in development
 if (process.env.NODE_ENV !== "production") {
   await import("dotenv").then((dotenv) => {
@@ -18,9 +17,10 @@ mongoose
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("", authRouter);
-app.use("/patients",patientRouter)
+app.use("/patient",patientRouter)
 
 
 

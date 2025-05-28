@@ -3,8 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const privateKey = "Mykey@5432";
-const options = {
+const optionsAccess = {
   expiresIn: "1h",
+};
+
+const optionsRefresh = {
+  expiresIn: "7d",
 };
 
 export const authenticateUser = async (email, password) => {
@@ -14,16 +18,104 @@ export const authenticateUser = async (email, password) => {
   return await bcrypt.compare(password, user.password);
 };
 
-export const generateJwt = async (email) => {
+export const getAccessToken = async (email) => {
   let user = await User.findOne({ email });
-  const payload = {
+  const payloadAccess = {
+    type: "access",
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     roles: user.roles,
   };
 
-  return jwt.sign(payload, privateKey, options);
+  return jwt.sign(payloadAccess, privateKey, optionsAccess);
 };
 
+export const getRefreshToken = async (email) => {
+  let user = await User.findOne({ email });
+  const payLoadRefresh = {
+    type: "refresh",
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    roles: user.roles,
+  };
 
+  return jwt.sign(payLoadRefresh, privateKey, optionsRefresh);
+};
+
+// export const updateUser = async (user) => {};
+
+export const createUser = async (userData) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      roles,
+      designation,
+      salary,
+      dateOfBirth,
+      contact,
+      address,
+    } = userData;
+
+    // Simple validation
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !designation ||
+      !salary ||
+      !dateOfBirth ||
+      !contact
+    ) {
+      return {
+        success: false,
+        message: "Missing Required Fields",
+      };
+    }
+
+    // Check for duplicate email
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return {
+        success: false,
+        message: "Email already in use",
+      };
+    }
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password, // Will be hashed in pre-save hook
+      roles: roles || ["user"],
+      designation,
+      salary,
+      dateOfBirth,
+      contact,
+      address,
+    });
+
+    await user.save();
+
+    return {
+      success: true,
+      message: "User created successfully",
+      user: {
+        empId: user.empId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        roles: user.roles,
+        designation: user.designation,
+      },
+    };
+  } catch (error) {
+    console.error("User creation failed:", error);
+    return { success: false, message: "Internal server error" };
+  }
+};
