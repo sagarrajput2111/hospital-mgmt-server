@@ -5,7 +5,11 @@ import {
   getAllPatientsController,
   getPatientByIdController,
   getPriorityPatientController,
-  generateInvoiceController
+  generateInvoiceController,
+  getAllInvoiceWithPatientController,
+  servePatientController,
+  payInvoiceController
+
 
 } from "../controllers/patient.controller.js";
 
@@ -15,8 +19,11 @@ router.use(verifyToken);
 router.post("/admit", admitPatientController);
 router.get("/all-patients", getAllPatientsController);
 router.get("/priority-patient", getPriorityPatientController);
-router.get("/:patientId", getPatientByIdController);
+router.get("/invoices",getAllInvoiceWithPatientController);
+router.post("/serve-patient",servePatientController);
 router.post("/invoice/generate",generateInvoiceController);
+router.post("/invoice/pay",payInvoiceController);
+router.get("/:patientId", getPatientByIdController);
 
 
 export default router;

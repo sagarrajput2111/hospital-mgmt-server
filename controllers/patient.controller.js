@@ -3,7 +3,10 @@ import {
   getAllPatients,
   getPatientById,
   getPriorityPatient,
-  generateInvoice
+  generateInvoice,
+  getAllInvoicesWithPatientDetails,
+  servePatient,
+  payInvoice
 } from "../services/patient.service.js";
 
 export const admitPatientController = async (req, res) => {
@@ -54,7 +57,7 @@ export const getAllPatientsController = async (req, res) => {
       patients: patients.patients,
     });
   } catch (error) {
-    console.log("patient array")
+    console.log("patient array");
     console.error("Error fetching patients:", error);
     res.status(500).json({
       message: "An error occurred while fetching the patients",
@@ -115,13 +118,11 @@ export const getPriorityPatientController = async (req, res) => {
   }
 };
 
-
-export const generateInvoiceController=async (req,res)=>{
+export const generateInvoiceController = async (req, res) => {
   try {
     const { patientId } = req.body;
 
     // Example: You can get charges and servedCount from request body or elsewhere
-    
 
     const result = await generateInvoice(patientId);
 
@@ -136,11 +137,93 @@ export const generateInvoiceController=async (req,res)=>{
       invoice: result.invoice,
     });
   } catch (error) {
-    console.error('Error in generateInvoiceController:', error);
+    console.error("Error in generateInvoiceController:", error);
     return res.status(500).json({
-      message: 'Server error while generating invoice',
+      message: "Server error while generating invoice",
       error: error.message,
     });
   }
-
 };
+
+export const getAllInvoiceWithPatientController = async (req, res) => {
+  try {
+    const result = await getAllInvoicesWithPatientDetails();
+
+    if (!result.success) {
+      return res.status(500).json({
+        message: result.message,
+        error: result.error,
+      });
+    }
+
+    return res.status(200).json({
+      message: result.message,
+      invoices: result.invoices,
+    });
+  } catch (error) {
+    console.error("Error in getAllInvoicesController:", error);
+    return res.status(500).json({
+      message: "Server error while fetching invoices",
+      error: error.message,
+    });
+  }
+};
+
+export const servePatientController = async (req, res) => {
+  try {
+    const { patientId, priority, remark } = req.body;
+    console.log(patientId, " ", priority, " ", remark);
+
+    if (!patientId || !remark?.note || !remark?.servedBy) {
+      return res.status(400).json({
+        message: "patientId, remark.note and remark.servedBy are required",
+      });
+    }
+
+    const result = await servePatient({ patientId, priority, remark });
+
+    if (!result.success) {
+      return res.status(404).json({ message: result.message });
+    }
+
+    return res.status(200).json({
+      message: result.message,
+      patient: result.patient,
+    });
+  } catch (error) {
+    console.error("Error in servePatientController:", error);
+    return res.status(500).json({
+      message: "Internal server error while serving patient",
+      error: error.message,
+    });
+  }
+};
+
+export const payInvoiceController = async (req, res) => {
+  try {
+    const result = await payInvoice(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        error: result.error,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      invoice: result.invoice,
+    });
+
+  } catch (error) {
+    console.error("Unexpected error in payInvoiceController:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unexpected server error",
+      error: error.message,
+    });
+  }
+};
+

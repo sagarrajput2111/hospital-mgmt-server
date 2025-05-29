@@ -169,3 +169,119 @@ export const generateInvoice = async (patientId) => {
     };
   }
 };
+
+//get all the invoices with patient details
+export const getAllInvoicesWithPatientDetails = async () => {
+  try {
+    const invoices = await Invoice.find()
+      .populate("patient") // Populates the patient field with patient details
+      .sort({ createdAt: -1 });
+    // Optional: sort by latest invoices
+    
+    console.log(invoices);
+    return {
+      success: true,
+      message: "Invoices fetched successfully",
+      invoices,
+    };
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    return {
+      success: false,
+      message: "Error while fetching invoices",
+      error: error.message,
+    };
+  }
+};
+
+
+export const servePatient=async ({patientId,priority,remark})=>{
+  try {
+    const patient = await Patient.findOne({ patientId });
+
+    if (!patient) {
+      return {
+        success: false,
+        message: "Patient not found",
+      };
+    }
+
+    // Update servedCount, priority, and push new remark
+    patient.servedCount += 1;
+
+    if (priority) {
+      patient.priority = priority;
+    }
+
+    patient.remarks.push({
+      note: remark.note,
+      servedBy: remark.servedBy,
+      servedAt: new Date(), // Optional, since schema already sets default
+    });
+
+    const updatedPatient = await patient.save();
+
+    return {
+      success: true,
+      message: "Patient served successfully",
+      patient: updatedPatient,
+    };
+  } catch (error) {
+    console.error("Error serving patient:", error);
+    return {
+      success: false,
+      message: "Server error while serving patient",
+      error: error.message,
+    };
+  }
+};
+
+export const payInvoice = async ({ _id, paymentMethod, remarks }) => {
+  try {
+    if (!_id || !paymentMethod) {
+      return {
+        success: false,
+        message: "invoiceId and paymentMethod are required",
+      };
+    }
+
+    const invoice = await Invoice.findById(_id);
+    if (!invoice) {
+      return {
+        success: false,
+        message: "Invoice not found",
+      };
+    }
+
+    if (invoice.isPaid) {
+      return {
+        success: false,
+        message: "Invoice is already marked as paid",
+      };
+    }
+
+    invoice.isPaid = true;
+    invoice.paidAt = new Date();
+    invoice.paymentMethod = paymentMethod;
+    if (remarks) {
+      invoice.remarks = remarks;
+    }
+
+    const updatedInvoice = await invoice.save();
+
+    return {
+      success: true,
+      message: "Invoice payment successful",
+      invoice: updatedInvoice,
+    };
+
+  } catch (error) {
+    console.error("Error in payInvoice service:", error);
+    return {
+      success: false,
+      message: "Server error while processing payment",
+      error: error.message,
+    };
+  }
+};
+
