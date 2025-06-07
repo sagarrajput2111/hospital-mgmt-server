@@ -285,3 +285,31 @@ export const payInvoice = async ({ _id, paymentMethod, remarks }) => {
   }
 };
 
+export const getPatientByBed=async (bedNumber)=>{
+  try {
+    // Fetch a patient by their bed from the database
+    const patient = await Patient.findOne({ bedNumber }).select();
+
+    if (!patient) {
+      return {
+        success: false,
+        message: "Patient not found",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Patient fetched successfully",
+      patient: patient,
+    };
+  } catch (error) {
+    console.error("Error fetching patient by ID:", error);
+    return {
+      success: false,
+      message: "An error occurred while fetching the patient",
+      error: error.message,
+    };
+  }
+
+};
+

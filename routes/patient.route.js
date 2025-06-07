@@ -8,7 +8,8 @@ import {
   generateInvoiceController,
   getAllInvoiceWithPatientController,
   servePatientController,
-  payInvoiceController
+  payInvoiceController,
+  getPatientByBedController
 
 
 } from "../controllers/patient.controller.js";
@@ -23,6 +24,7 @@ router.get("/invoices",getAllInvoiceWithPatientController);
 router.post("/serve-patient",servePatientController);
 router.post("/invoice/generate",generateInvoiceController);
 router.post("/invoice/pay",payInvoiceController);
+router.get("/patientByBed",getPatientByBedController);
 router.get("/:patientId", getPatientByIdController);
 
 

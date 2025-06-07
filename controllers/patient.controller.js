@@ -6,7 +6,8 @@ import {
   generateInvoice,
   getAllInvoicesWithPatientDetails,
   servePatient,
-  payInvoice
+  payInvoice,
+  getPatientByBed
 } from "../services/patient.service.js";
 
 export const admitPatientController = async (req, res) => {
@@ -225,5 +226,32 @@ export const payInvoiceController = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export const getPatientByBedController= async (req,res)=>{
+  try {
+    console.log("Fetching patient by BedNumber", req.params["bedNumber"]);
+    const bedNumber = req.query.bedNumber; 
+
+    // Here you would typically fetch the patient data from a database
+    const patient = await getPatientByBed(bedNumber);
+
+    if (!patient.success) {
+      return res.status(404).json({
+        message: patient.message,
+      });
+    }
+    return res.status(200).json({
+      message: "Patient fetched successfully",
+      patient: patient.patient,
+    });
+  } catch (error) {
+    console.error("Error fetching patient by ID:", error);
+    res.status(500).json({
+      message: "An error occurred while fetching the patient",
+      error: error.message,
+    });
+  }
+
 };
 

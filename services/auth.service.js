@@ -22,9 +22,15 @@ export const getAccessToken = async (email) => {
   let user = await User.findOne({ email });
   const payloadAccess = {
     type: "access",
+    _id: user._id,
+    empId: user.empId,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    designation: user.designation,
+    contact: user.contact,
+    dateOfBirth: user.dateOfBirth,
+    address: user.address,
     roles: user.roles,
   };
 
